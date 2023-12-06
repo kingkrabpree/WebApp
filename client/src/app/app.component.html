@@ -1,8 +1,4 @@
 <app-nav></app-nav>
-
-{{title}}
-<ul>
-    <li *ngFor="let item of users">
-        <fa-icon [icon]="faBell"></fa-icon> {{item.id}} : {{item.userName}}
-    </li>
-</ul>
+<div class="container">
+    <router-outlet></router-outlet>
+</div>

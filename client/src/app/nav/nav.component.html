@@ -14,12 +14,14 @@
         </ul>
         <form *ngIf="!(currentUser$ | async)" class="d-flex" #logingForm="ngForm" (ngSubmit)="login()"
             autocomplete="off">
-            <input class="form-control me-2" name="Username" [(ngModel)]="model.username">
-            <input class="form-control me-2" name="Password" [(ngModel)]="model.password">
+            <input name="username" [(ngModel)]="model.username" class="form-control me-2" type="text"
+                placeholder="Username">
+            <input name="password" [(ngModel)]="model.password" class="form-control me-2" type="password"
+                placeholder="Password">
             <button class="btn btn-outline-success" type="submit">Login</button>
         </form>
         <div dropdown class="dropdown" *ngIf="currentUser$ | async">
-            <a dropdownToggle class="dropdown-toggle text-light">Hello user</a>
+            <a dropdownToggle class="dropdown-toggle text-light">Hello {{user?.username | titlecase}}</a>
             <div *dropdownMenu="" class="dropdown-menu">
                 <a class="dropdown-item">Profile</a>
                 <a class="dropdown-item" (click)="Logout()">Logout</a>

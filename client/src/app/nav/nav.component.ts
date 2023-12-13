@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core'
 import { AccountService } from '../_services/account.service'
-import { Observable, of } from 'rxjs'
+import { Observable, map, of } from 'rxjs'
 import { User } from '../_services/_model/user'
 import { Router } from '@angular/router'
 import { ToastrService } from 'ngx-toastr'
@@ -11,6 +11,7 @@ import { ToastrService } from 'ngx-toastr'
   styleUrls: ['./nav.component.css']
 })
 export class NavComponent implements OnInit {
+  user: User | null = null
   currentUser$: Observable<User | null> = of(null)
   model: any = {}
   constructor(private toastr: ToastrService, private router: Router, private accountService: AccountService) {
@@ -18,6 +19,10 @@ export class NavComponent implements OnInit {
   }
   ngOnInit(): void {
     this.currentUser$ = this.accountService.currentUser$
+    this.currentUser$.subscribe({
+      next: user => { this.user = user }
+    })
+
   }
   login(): void {
     this.accountService.login(this.model).subscribe({ //Observable

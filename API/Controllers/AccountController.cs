@@ -5,6 +5,7 @@ using API.Data;
 using API.DTOs;
 using API.Entities;
 using API.Interfaces;
+using AutoMapper;
 using Company.ClassLibrary1;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -16,10 +17,13 @@ public class AccountController : BaseApiController
     private readonly DataContext _dataContext;
 
     private readonly ITokenservice _tokenService;
-    public AccountController(DataContext dataContext, ITokenservice tokenService)
+    private readonly IMapper _mapper;
+
+    public AccountController(DataContext dataContext, ITokenservice tokenService, IMapper mapper)
     {
         _dataContext = dataContext;
         _tokenService = tokenService;
+        _mapper = mapper;
     }
     private async Task<bool> isUserExists(string username)
     {
@@ -28,7 +32,9 @@ public class AccountController : BaseApiController
     [HttpPost("login")]
     public async Task<ActionResult<UserDto>> Login(LoginDto loginDto)
     {
-        var user = await _dataContext.Users.SingleOrDefaultAsync(user =>
+        var user = await _dataContext.Users
+                        .Include(photo => photo.Photos)
+                        .SingleOrDefaultAsync(user =>
                             user.UserName == loginDto.Username);
 
         if (user is null) return Unauthorized("invalid username");
@@ -43,24 +49,35 @@ public class AccountController : BaseApiController
         return new UserDto
         {
             Username = user.UserName,
-            Token = _tokenService.CreateToken(user)
+            Token = _tokenService.CreateToken(user),
+            PhotoUrl = user.Photos.FirstOrDefault(photo => photo.IsMain)?.Url,
+            Aka = user.Aka,
+            Gender = user.Gender
         };
     }
     [HttpPost("register")]
-    public async Task<ActionResult<AppUser>> Register(RegisterDto registerDto)
+    public async Task<ActionResult<UserDto>> Register(RegisterDto registerDto)
     {
         if (await isUserExists(registerDto.Username!))
             return BadRequest("username is already exists");
+        var user = _mapper.Map<AppUser>(registerDto);
         using var hmacSHA256 = new HMACSHA256();
-        var user = new AppUser
-        {
-            UserName = registerDto.Username.Trim().ToLower(),
-            PasswordHash = hmacSHA256.ComputeHash(Encoding.UTF8.GetBytes(registerDto.Password.Trim())),
-            PasswordSalt = hmacSHA256.Key
-        };
+        //var user = new AppUser
+        // {
+        user.UserName = registerDto.Username!.Trim().ToLower();
+        user.PasswordHash = hmacSHA256.ComputeHash(Encoding.UTF8.GetBytes(registerDto.Password!.Trim()));
+        user.PasswordSalt = hmacSHA256.Key;
+        // };
         _dataContext.Users.Add(user);
         await _dataContext.SaveChangesAsync();
-        return user;
+        return new UserDto
+        {
+            Username = user.UserName,
+            Token = _tokenService.CreateToken(user),
+            PhotoUrl = user.Photos.FirstOrDefault(photo => photo.IsMain)?.Url,
+            Aka = user.Aka,
+            Gender = user.Gender
+        };
     }
 
     private Task<bool> isUserExists(object v)

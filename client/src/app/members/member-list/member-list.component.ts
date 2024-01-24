@@ -1,6 +1,10 @@
 import { Component, OnInit } from '@angular/core'
-import { Observable } from 'rxjs'
+import { Observable, take } from 'rxjs'
 import { Member } from 'src/app/_services/_model/member'
+import { Pagination } from 'src/app/_services/_model/pagination'
+import { User } from 'src/app/_services/_model/user'
+import { UserParams } from 'src/app/_services/_model/userParams'
+import { AccountService } from 'src/app/_services/account.service'
 import { MembersService } from 'src/app/_services/members.service'
 
 @Component({
@@ -9,19 +13,54 @@ import { MembersService } from 'src/app/_services/members.service'
   styleUrls: ['./member-list.component.css']
 })
 export class MemberListComponent implements OnInit {
-  // members: Member[] = []
-  members$: Observable<Member[]> | undefined
-  constructor(private memberService: MembersService) { }
-
-  ngOnInit(): void {
-    this.members$ = this.memberService.getMembers()
+  //members$: Observable<Member[]> | undefined
+  genderList = [
+    { value: 'male', display: 'Male' },
+    { value: 'fmale', display: 'Female' },
+    { value: 'non-binary', display: 'Non-binary' },
+  ]
+  members: any
+  resetFilters() {
+    if (this.user) {
+      //this.userParams = new UserParams(this.user)
+      this.userParams = this.memberService.resetUserParams()
+      this.loadMember()
+    }
+  }
+  pagination: Pagination | undefined
+  userParams: UserParams | undefined
+  user: User | undefined
+  //members: Member[] = []
+  constructor(private memberService: MembersService) {
+    this.userParams = this.memberService.getUserParams()
   }
 
-  // loadMember() {
-  //   this.memberService.getMembers().subscribe({
-  //     next: resp => {
-  //       this.members = resp
-  //     }
-  //   })
-  // }
+
+  ngOnInit(): void {
+    this.loadMember()
+  }
+
+  loadMember() {
+    // if (!this.userParams) return
+    if (this.userParams) {
+      this.memberService.setUserParams(this.userParams)
+      this.memberService.getMembers(this.userParams).subscribe({
+        next: response => {
+          if (response.result && response.pagination) {
+            this.members = response.result
+            this.pagination = response.pagination
+          }
+        }
+      })
+    }
+  }
+
+  pageChanged(event: any) {
+    if (!this.userParams) return
+    if (this.userParams.pageNumber === event.page) return
+    this.userParams.pageNumber = event.page
+    this.loadMember()
+    this.memberService.setUserParams(this.userParams)
+    this.loadMember()
+  }
 }

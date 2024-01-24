@@ -1,4 +1,5 @@
 ﻿using API.Data;
+using API.Helpers;
 using API.Interfaces;
 using API.Services;
 using Company.ClassLibrary1;
@@ -20,6 +21,8 @@ public static class AppServiceExtention
         services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
         services.Configure<CloudinarySettings>(conf.GetSection("CloudinarySettings"));
         services.AddScoped<IImageService, ImageService>();
+        services.AddScoped<LogUserActivity>();
+        services.AddScoped<IlikesRepository, LikesRepository>();
         return services;
 
     }

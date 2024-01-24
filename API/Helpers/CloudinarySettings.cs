@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Company.ClassLibrary1;
+namespace API.Helpers;
 
 public class CloudinarySettings
 {

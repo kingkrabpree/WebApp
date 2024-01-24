@@ -18,12 +18,10 @@
                 </div>
                 <div>
                     <strong>Last active:</strong>
-                    <p>{{member.lastActive}}</p>
-                </div>
+                    <p>{{member.lastActive | timeago}}</p>                
                 <div>
                     <strong>Member since:</strong>
-                    <p>{{member.created}}</p>
-                </div>
+                    <p>{{member.created| date: 'dd MMM yyyy'}}</p>            
             </div>
             <div class="card-footer">
                 <div class="btn-group d-flex">
@@ -64,3 +62,7 @@
         </tabset>
     </div>
 </div>
+<tab heading="Edit Photos">
+    <!-- <p> under construct !! </p> -->
+    <app-photo-editor [member]="member"></app-photo-editor>
+</tab>

@@ -21,9 +21,9 @@ public static class AppServiceExtention
         services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
         services.Configure<CloudinarySettings>(conf.GetSection("CloudinarySettings"));
         services.AddScoped<IImageService, ImageService>();
+        services.AddScoped<IMessageRepository, MessageRepository>();
         services.AddScoped<LogUserActivity>();
         services.AddScoped<IlikesRepository, LikesRepository>();
         return services;
-
     }
 }

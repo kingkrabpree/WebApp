@@ -2,10 +2,10 @@ import { Component, Input, OnInit } from '@angular/core'
 import { faTrashCan, faStar, faUpload, faBan } from '@fortawesome/free-solid-svg-icons'
 import { FileUploader } from 'ng2-file-upload'
 import { take } from 'rxjs'
-import { Member, Photo } from 'src/app/_services/_model/member'
-import { User } from 'src/app/_services/_model/user'
+import { Member, Photo } from 'src/app/_model/member'
+import { User } from 'src/app/_model/user'
 import { AccountService } from 'src/app/_services/account.service'
-import { MembersService } from 'src/app/_services/members.service'
+import { MembersService } from 'src/app/_services/MembersService'
 import { environment } from 'src/environments/environment'
 
 @Component({

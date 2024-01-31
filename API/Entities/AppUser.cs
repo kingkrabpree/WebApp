@@ -1,5 +1,4 @@
-﻿using API.Extensions;
-namespace API.Entities;
+﻿namespace API.Entities;
 #nullable disable
 public class AppUser
 {
@@ -20,11 +19,6 @@ public class AppUser
     public DateTime LastActive { get; set; } = DateTime.UtcNow;
     public List<UserLike> LikedByUsers { get; set; }
     public List<UserLike> LikedUsers { get; set; }
-    // public int Age
-    // {
-    //     get
-    //     {
-    //         return BirthDate.CalculateAge(); //using API.Extensions
-    //     }
-    // }
+    public List<Message> MessagesSent { get; set; }
+    public List<Message> MessagesReceived { get; set; }
 }

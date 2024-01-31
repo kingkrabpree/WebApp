@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http'
 import { Component, OnInit } from '@angular/core'
 import { faBell } from '@fortawesome/free-solid-svg-icons'
 import { AccountService } from './_services/account.service'
-import { User } from './_services/_model/user'
+import { User } from './_model/user'
 
 @Component({
   selector: 'app-root',

@@ -4,8 +4,8 @@ import { ActivatedRoute } from '@angular/router'
 import { Gallery, GalleryItem, GalleryModule, ImageItem } from 'ng-gallery'
 import { TabsModule } from 'ngx-bootstrap/tabs'
 import { TimeagoModule } from 'ngx-timeago'
-import { Member } from 'src/app/_services/_model/member'
-import { MembersService } from 'src/app/_services/members.service'
+import { Member } from 'src/app/_model/member'
+import { MembersService } from 'src/app/_services/MembersService'
 
 @Component({
   selector: 'app-member-detail',

@@ -2,10 +2,10 @@ import { Component, HostListener, OnInit, ViewChild } from '@angular/core'
 import { NgForm } from '@angular/forms'
 import { ToastrService } from 'ngx-toastr'
 import { take } from 'rxjs'
-import { Member } from 'src/app/_services/_model/member'
-import { User } from 'src/app/_services/_model/user'
+import { Member } from 'src/app/_model/member'
+import { User } from 'src/app/_model/user'
 import { AccountService } from 'src/app/_services/account.service'
-import { MembersService } from 'src/app/_services/members.service'
+import { MembersService } from 'src/app/_services/MembersService'
 
 @Component({
   selector: 'app-member-profile',

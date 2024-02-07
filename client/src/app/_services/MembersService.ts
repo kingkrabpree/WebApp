@@ -6,6 +6,7 @@ import { Injectable } from '@angular/core'
 import { map, of } from 'rxjs'
 import { UserParams } from '../_model/userParams'
 import { getPaginationHeaders, getPaginationResult } from './paginationHelper'
+import { Message } from '../_model/message'
 
 
 @Injectable({

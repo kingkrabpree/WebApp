@@ -6,6 +6,7 @@ using API.Helpers;
 using API.Interfaces;
 using AutoMapper;
 using Company.ClassLibrary1;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 namespace API.Controllers;
 
@@ -56,14 +57,8 @@ public class UsersController : BaseApiController
         }
         return BadRequest("Something has gone wrong!");
     }
-
+    //[Authorize(Roles = "Administrator")]
     [HttpGet]
-    // public async Task<ActionResult<IEnumerable<MemberDto>>> GetUsers()
-    // {
-    //     // var users = await _userRepository.GetUsersAsync();
-    //     // return Ok(_mapper.Map<IEnumerable<MemberDto>>(users));
-    //     return Ok(await _userRepository.GetMembersAsync());
-    // }
     public async Task<ActionResult<PageList<MemberDto>>> GetUsers([FromQuery] UserParams userParams)
     {
         var username = User.GetUsername();
@@ -90,6 +85,7 @@ public class UsersController : BaseApiController
         var user = await _userRepository.GetUserByIdAsync(id);
         return _mapper.Map<MemberDto>(user);
     }
+    [Authorize(Roles = "Administrator,Moderator,Member")]
     [HttpGet("username/{username}")]
     public async Task<ActionResult<MemberDto?>> GetUserByUserName(string username)
     {

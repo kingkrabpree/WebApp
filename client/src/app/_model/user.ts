@@ -5,4 +5,5 @@ export interface User {
     photoUrl: string
     aka: string
     gender: string
+    roles: string[]
 }

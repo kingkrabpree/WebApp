@@ -3,6 +3,7 @@ import { faUser, faHeart, faEnvelope } from '@fortawesome/free-solid-svg-icons'
 import { ToastrService } from 'ngx-toastr'
 import { Member } from 'src/app/_model/member'
 import { MembersService } from 'src/app/_services/MembersService'
+import { PresenceService } from 'src/app/_services/presence.service'
 
 @Component({
   selector: 'app-member-card',
@@ -10,7 +11,7 @@ import { MembersService } from 'src/app/_services/MembersService'
   styleUrls: ['./member-card.component.css']
 })
 export class MemberCardComponent {
-  constructor(private memberService: MembersService, private toastr: ToastrService) { }
+  constructor(public presenceService: PresenceService, private memberService: MembersService, private toastr: ToastrService) { }
   faUser = faUser
   faHeart = faHeart
   faEnvelope = faEnvelope

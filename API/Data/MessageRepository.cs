@@ -25,7 +25,7 @@ public class MessageRepository : IMessageRepository
 
     public async Task<Message> GetMessage(int id) => await _dataContext.Messages.FindAsync(id);
 
-    public async Task<IEnumerable<MessageDto>> GetMessageThread(string recipientUserName, string senderUsername)
+    public async Task<IEnumerable<MessageDto>> GetMessageThread(string thisUserName, string recipientUserName)
     {
         var messages = await _dataContext.Messages
                    .Include(ms => ms.Sender).ThenInclude(user => user.Photos)
@@ -42,7 +42,7 @@ public class MessageRepository : IMessageRepository
                    .ToListAsync();
 
         var unreadMessages = messages
-                        .Where(ms => ms.DateRead == null && ms.RecipientUsername == senderUsername)
+                        .Where(ms => ms.DateRead == null && ms.RecipientUsername == thisUserName)
                         .ToList();
 
         if (unreadMessages.Any())

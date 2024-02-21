@@ -9,6 +9,10 @@ import { MembersService } from 'src/app/_services/MembersService'
 import { MemberMessagesComponent } from '../member-messages/member-messages.component'
 import { Message } from 'src/app/_model/message'
 import { MessageService } from 'src/app/_services/message.service'
+import { PresenceService } from 'src/app/_services/presence.service'
+import { AccountService } from 'src/app/_services/account.service'
+import { take } from 'rxjs'
+import { User } from 'src/app/_model/user'
 
 @Component({
   selector: 'app-member-detail',
@@ -21,14 +25,23 @@ export class MemberDetailComponent implements OnInit {
   @ViewChild('memberTabs', { static: true }) memberTabs?: TabsetComponent
   activeTab?: TabDirective
   messages: Message[] = []
+  user?: User
   member: Member = {} as Member
   photos: GalleryItem[] = []
-  constructor(private messageService: MessageService, private memberService: MembersService, private route: ActivatedRoute) { }
-
+  constructor(public presenceService: PresenceService, private messageService: MessageService, private accountService: AccountService, private route: ActivatedRoute) {
+    this.accountService.currentUser$.pipe(take(1)).subscribe({
+      next: user => {
+        if (user) this.user = user
+      }
+    })
+  }
+  ngOnDestroy(): void {
+    this.messageService.stopHubConnection()
+  }
   ngOnInit(): void {
     this.route.data.subscribe({
       next: data => {
-        this.member = data['member'] //เพราะเราตั้งชื่อ member ใน app-routing.module.ts
+        this.member = data['member']
         this.getImages()
       }
     })
@@ -39,9 +52,10 @@ export class MemberDetailComponent implements OnInit {
 
   onTabActivated(tab: TabDirective) {
     this.activeTab = tab
-    if (this.activeTab.heading === 'Messages') {
-      this.loadMessages()
-    }
+    if (this.activeTab.heading === 'Messages' && this.user)
+      this.messageService.createHubConnection(this.user, this.member.userName)
+    else
+      this.messageService.stopHubConnection()
   }
   selectTab(tabHeading: string) {
     if (!this.memberTabs) return
@@ -56,16 +70,16 @@ export class MemberDetailComponent implements OnInit {
     })
   }
 
-  loadMember() {
-    const username = this.route.snapshot.paramMap.get('username')
-    if (!username) return
-    this.memberService.getMember(username).subscribe({
-      next: user => {
-        this.member = user
-        this.getImages()
-      }
-    })
-  }
+  // loadMember() {
+  //   const username = this.route.snapshot.paramMap.get('username')
+  //   if (!username) return
+  //   this.memberService.getMember(username).subscribe({
+  //     next: user => {
+  //       this.member = user
+  //       this.getImages()
+  //     }
+  //   })
+  // }
   getImages() {
     if (!this.member) return
     for (const photo of this.member.photos) {

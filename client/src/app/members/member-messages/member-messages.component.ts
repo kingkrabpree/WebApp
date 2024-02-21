@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common'
-import { Component, Input, ViewChild } from '@angular/core'
+import { ChangeDetectionStrategy, Component, Input, ViewChild } from '@angular/core'
 import { FormsModule, NgForm } from '@angular/forms'
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome'
 import { faClock, faPaperPlane } from '@fortawesome/free-solid-svg-icons'
@@ -8,6 +8,7 @@ import { Message } from 'src/app/_model/message'
 import { MessageService } from 'src/app/_services/message.service'
 import { NgxLongPress2Module } from 'ngx-long-press2'
 @Component({
+  changeDetection: ChangeDetectionStrategy.OnPush,
   standalone: true,
   imports: [CommonModule, FontAwesomeModule, TimeagoModule, FormsModule, NgxLongPress2Module],
   selector: 'app-member-messages',
@@ -22,7 +23,7 @@ export class MemberMessagesComponent {
   faClock = faClock
   faPaperPlane = faPaperPlane
 
-  constructor(private messageService: MessageService) { }
+  constructor(public messageService: MessageService) { }
 
   loadMessages() {
     if (!this.username) return
@@ -33,11 +34,8 @@ export class MemberMessagesComponent {
   }
   sendMessage() {
     if (!this.username) return
-    this.messageService.sendMessage(this.username, this.messageContent).subscribe({
-      next: response => {
-        this.messages.push(response)
-        this.messageForm?.reset()
-      }
+    this.messageService.sendMessage(this.username, this.messageContent)?.then(() => {
+      this.messageForm?.reset()
     })
   }
   onLongPressMessage(id: number) {

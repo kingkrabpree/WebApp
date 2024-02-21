@@ -3,15 +3,46 @@ import { Injectable } from '@angular/core'
 import { environment } from 'src/environments/environment'
 import { getPaginationHeaders, getPaginationResult } from './paginationHelper'
 import { Message } from '../_model/message'
+import { HubConnection, HubConnectionBuilder } from '@microsoft/signalr'
+import { BehaviorSubject, take } from 'rxjs'
+import { User } from '../_model/user'
 
 @Injectable({
   providedIn: 'root'
 })
 export class MessageService {
+  hubUrl = environment.hubUrl
+  private _hubConnection?: HubConnection
+  private _messageThread = new BehaviorSubject<Message[]>([])
   baseUrl = environment.apiUrl
+  messageThread$ = this._messageThread.asObservable()
 
   constructor(private http: HttpClient) { }
 
+  createHubConnection(user: User, otherUsername: string) {
+    const url = this.hubUrl + 'message?user=' + otherUsername
+
+    this._hubConnection = new HubConnectionBuilder()
+      .withUrl(url, { accessTokenFactory: () => user.token })
+      .withAutomaticReconnect()
+      .build()
+    this._hubConnection.start().catch(error => console.log(error))
+
+    this._hubConnection.on('MessageThread', message => {
+      this._messageThread.next(message)
+    })
+    this._hubConnection.on('NewMessage', newMessage => {
+      this._messageThread.pipe(take(1)).subscribe({
+        next: messages => {
+          this._messageThread.next([...messages, newMessage])
+        }
+      })
+    })
+  }
+  stopHubConnection() {
+    if (this._hubConnection)
+      this._hubConnection?.stop().catch(error => console.log(error))
+  }
   getMessages(pageNumber: number, pageSize: number, label: string = "Unread") {
     let httpParams = getPaginationHeaders(pageNumber, pageSize)
     httpParams = httpParams.append('Label', label)
@@ -21,9 +52,12 @@ export class MessageService {
     return getPaginationResult<Message[]>(url, httpParams, this.http)
   }
   sendMessage(recipientUsername: string, content: string) {
-    const url = this.baseUrl + 'messages'
-    const body = { recipientUsername, content } //ต้องสะกดตรงกับ CreateMessageDto.cs
-    return this.http.post<Message>(url, body)
+    // const url = this.baseUrl + 'messages'
+    // const body = { recipientUsername, content } //ต้องสะกดตรงกับ CreateMessageDto.cs
+    // return this.http.post<Message>(url, body)
+    return this._hubConnection?.invoke('SendMessage', {
+      recipientUsername, content
+    }).catch(error => console.log(error))
   }
   getMessagesThread(username: string) {
     const url = this.baseUrl + 'messages/thread/' + username

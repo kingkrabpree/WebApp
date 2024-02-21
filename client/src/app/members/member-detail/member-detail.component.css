@@ -13,3 +13,7 @@
     background-color: white;
     border-top: none;
 }
+
+.gallery {
+    height: 500px;
+}

@@ -15,6 +15,8 @@ public class DataContext : IdentityDbContext<AppUser,
     IdentityUserToken<int>>
 {
     public DbSet<Message> Messages { get; set; }
+    public DbSet<MessageGroup> MessageGroups { get; set; }
+    public DbSet<Connection> Connections { get; set; }
     public DataContext(DbContextOptions options) : base(options)
     {
 
@@ -58,6 +60,8 @@ public class DataContext : IdentityDbContext<AppUser,
             .HasOne(message => message.Sender)
             .WithMany(appuser => appuser.MessagesSent)
             .OnDelete(DeleteBehavior.Restrict);
+
+
     }
 }
 
